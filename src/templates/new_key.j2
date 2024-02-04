@@ -1,15 +1,16 @@
 {% if data[0].id == 0 %}
 Выдал тебе новый ключ, вот он:<br>
-{{ data[0].key }}
+<code>{{ data[0].key }}</code>
 {% else %}
 
 У тебя уже есть ключи, вот они:<br>
 <br>
 {% for user_key in data %}
-#{{user_key.id}} {{user_key.user.name}} <br>{{user_key.key}}<br><br>
+#{{user_key.id}} {{user_key.user.name}} <br><code>{{user_key.key}}</code><br>
 {% endfor %}
 {% endif %}
 <br>
+Нажми на ключ для того чтобы скопировать его в буфер.<br>
 Полученный ключ вставь в приложение Outline Client.<br> 
 Скачать его можно здесь:<br>
 – iOS: https://itunes.apple.com/app/outline-app/id1356177741<br>
