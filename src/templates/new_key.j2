@@ -1,0 +1,22 @@
+{% if data[0].id == 0 %}
+Выдал тебе новый ключ, вот он:<br>
+{{ data[0].key }}
+{% else %}
+
+У тебя уже есть ключи, вот они:<br>
+<br>
+{% for user_key in data %}
+#{{user_key.id}} {{user_key.user.name}} <br>{{user_key.key}}<br><br>
+{% endfor %}
+{% endif %}
+<br>
+Полученный ключ вставь в приложение Outline Client.<br> 
+Скачать его можно здесь:<br>
+– iOS: https://itunes.apple.com/app/outline-app/id1356177741<br>
+– MacOS: https://itunes.apple.com/app/outline-app/id1356178125<br>
+– Windows: https://s3.amazonaws.com/outline-releases/client/windows/stable/Outline-Client.exe<br>
+– Linux: https://s3.amazonaws.com/outline-releases/client/linux/stable/Outline-Client.AppImage<br>
+– Android: https://play.google.com/store/apps/details?id=org.outline.android.client<br>
+- Android alternative link: https://s3.amazonaws.com/outline-releases/client/android/stable/Outline-Client.apk<br>
+<br>
+Если есть желание, настрой автоматическое включение и отключение VPN https://www.youtube.com/watch?v=_E8RCyz3KUY.

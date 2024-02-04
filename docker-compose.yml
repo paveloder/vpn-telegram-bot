@@ -1,0 +1,15 @@
+version: "3.6"
+services:
+
+  bot_service:
+    <<: &bot_service
+      # Image name is changed in production:
+      image: ""
+      build:
+        context: .
+        dockerfile: ./docker/Dockerfile
+        target: development_build
+        args:
+          SERVICE_ENV: development
+      env_file: ./config/.env
+      command: python ./src/__main__.py

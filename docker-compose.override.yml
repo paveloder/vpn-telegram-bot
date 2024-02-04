@@ -1,0 +1,9 @@
+version: "3.6"
+services:
+
+  bot_service:
+      volumes:
+        - .:/code/
+      platform: linux/x86_64
+      command:
+        sleep infinity
