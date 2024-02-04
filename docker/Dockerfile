@@ -26,7 +26,7 @@ RUN echo "$SERVICE_ENV" \
   && if [ "$SERVICE_ENV" = 'production' ]; then rm -rf "$POETRY_CACHE_DIR"; fi
 
 # create db objects if not exists:
-RUN if [-f /var/bot_service_data/db.sqlite3]; then \
+RUN if [ -f /var/bot_service_data/db.sqlite3 ]; then \
     echo "DB files exist"; \
   else \
     echo "creating DB objects"; \
