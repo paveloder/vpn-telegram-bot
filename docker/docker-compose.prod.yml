@@ -1,0 +1,10 @@
+version: "3.6"
+services:
+
+  web:
+    <<: &web
+      # Image for production:
+      build:
+        target: production_build
+        args:
+          SERVICE_ENV: production
