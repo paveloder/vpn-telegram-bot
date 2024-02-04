@@ -57,8 +57,6 @@ async def get_keys_for_user(telegram_user_id: int) -> Iterable[UserKey]:
     ]
 
 
-
-
 async def add_new_key(
     telegram_user_id: int,
     telegram_user_name: str,

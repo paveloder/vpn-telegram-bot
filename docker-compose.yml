@@ -15,3 +15,6 @@ services:
       command: python ./__main__.py
       volumes:
         - bot_service_data:/var/bot_service_data/
+
+volumes:
+  bot_service_data:

@@ -25,6 +25,15 @@ RUN echo "$SERVICE_ENV" \
   # Cleaning poetry installation's cache for production:
   && if [ "$SERVICE_ENV" = 'production' ]; then rm -rf "$POETRY_CACHE_DIR"; fi
 
+# create db objects if not exists:
+RUN if [-d /var/bot_service_data/db.sqlite3]; then \
+    echo "DB files exist"; \
+  else \
+    echo "creating DB objects"; \
+    cat ./src/db.sql | sqlite3 /var/bot_service_data/db.sqlite3; \
+  fi
+  
+
 COPY ./ci.sh /ci.sh
 RUN chmod +x '/ci.sh'
 
