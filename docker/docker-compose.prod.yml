@@ -1,8 +1,8 @@
 version: "3.6"
 services:
 
-  web:
-    <<: &web
+  bot_service:
+    <<: &bot_service
       # Image for production:
       build:
         target: production_build
