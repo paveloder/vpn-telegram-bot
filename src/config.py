@@ -13,7 +13,7 @@ PAYMENT_PROVIDER_TOKEN = os.getenv("PAYMENT_PROVIDER_TOKEN", "")
 BILLING_LIST_PATTERN = "my_billing"
 
 BASE_DIR = Path(__file__).resolve().parent
-SQLITE_DB_FILE = "db.sqlite3"
+SQLITE_DB_FILE = "/var/bot_service_data/db.sqlite3"
 TEMPLATES_DIR = BASE_DIR / "templates"
 
 DATE_FORMAT = "%d.%m.%Y"
