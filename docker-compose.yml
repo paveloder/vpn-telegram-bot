@@ -12,4 +12,4 @@ services:
         args:
           SERVICE_ENV: development
       env_file: ./config/.env
-      command: python ./src/__main__.py
+      command: python ./__main__.py

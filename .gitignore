@@ -1,6 +1,5 @@
 # ide folders
 .idea/
-.vscode/
 
 # not project files
 __pycache__
