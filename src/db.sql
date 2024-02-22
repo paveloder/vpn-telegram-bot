@@ -1,4 +1,4 @@
-create table bot_user (
+create table IF NOT EXISTS  bot_user (
   telegram_id bigint primary key,
   telegram_name  varchar(80),
   telegram_fullname  varchar(80),
@@ -8,7 +8,7 @@ create table bot_user (
 
 
 
-create table user_key(
+create table  IF NOT EXISTS user_key(
   id            integer primary key AUTOINCREMENT,
   telegram_id   bigint,
   key_name      varchar(60),
