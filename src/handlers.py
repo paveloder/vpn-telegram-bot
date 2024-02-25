@@ -1,12 +1,13 @@
 from typing import cast
 
 import telegram
+from sqlmodel.ext.asyncio.session import AsyncSession
 from telegram import Chat, InlineKeyboardMarkup, LabeledPrice, Update, User
 from telegram.ext import ContextTypes
 
 import src.services.db_management as db_management
 from src import config
-from src.templates import render_template
+from src.templates import render_template  # type: ignore
 
 
 async def send_response(
@@ -24,7 +25,7 @@ async def send_response(
     if keyboard:
         args["reply_markup"] = keyboard
 
-    await context.bot.send_message(**args)
+    await context.bot.send_message(**args)  # type: ignore
 
 
 def _get_chat_id(update: Update) -> int:
@@ -34,19 +35,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_response(update, context, response=render_template("start.j2"))
 
 async def get_new_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keys = await db_management.add_new_key(
-        cast(User, update.effective_user).id,
-        cast(User, update.effective_user).name,
-        cast(User, update.effective_user).full_name,
-    )
-    await send_response(
-        update,
-        context,
-        response=render_template(
-            "new_key.j2",
-            {"data": keys},
+    async with AsyncSession(config.engine, expire_on_commit=False) as session:
+        keys = await db_management.add_new_key(
+            cast(User, update.effective_user).id,
+            cast(User, update.effective_user).name,
+            cast(User, update.effective_user).full_name,
+            session,
         )
-    )
+        await session.commit()
+        await send_response(
+            update,
+            context,
+            response=render_template(
+                "new_key.j2",
+                {"data": keys},
+            )
+        )
 
 
 async def show_help(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -1,6 +1,7 @@
 import logging
 
 from telegram.ext import (
+    Application,
     ApplicationBuilder,
     CallbackQueryHandler,
     CommandHandler,
@@ -9,7 +10,7 @@ from telegram.ext import (
 )
 
 from src import config, handlers
-from src.db import close_db
+from src.db import async_init_db, close_db
 
 COMMAND_HANDLERS = {
     "start": handlers.start,
@@ -21,7 +22,7 @@ COMMAND_HANDLERS = {
 CALLBACK_QUERY_HANDLERS = {
     "pay": handlers.add_money_to_billing_account,
     "help": handlers.show_help,
-   # rf"^{config.BILLING_LIST_PATTERN}(\d+)$": handlers.all_books_button,
+    # rf"^{config.BILLING_LIST_PATTERN}(\d+)$": handlers.all_books_button,
 }
 
 
@@ -38,8 +39,14 @@ if not config.TELEGRAM_BOT_TOKEN or not config.VPN_TELEGRAM_BOT_CHANNEL_ID:
     )
 
 
+async def post_init(application: Application) -> None:
+    await async_init_db()
+
+
 def main():
-    application = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
+    application = (
+        ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).post_init(post_init).build()
+    )
 
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))

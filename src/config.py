@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 
 load_dotenv("./config/.env")
@@ -21,5 +22,5 @@ DATE_FORMAT = "%d.%m.%Y"
 
 
 engine = create_async_engine(
-    "sqlite+aiosqlite:///var/bot_service_data/db.sqlite3",
+    "sqlite+aiosqlite:////var/bot_service_data/db.sqlite3",
 )

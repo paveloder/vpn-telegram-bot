@@ -1,12 +1,12 @@
-{% if data[0].id == 0 %}
-Выдал тебе новый ключ, вот он:<br>
-<code>{{ data[0].key }}</code>
+{% if data.is_created %}
+Выдал тебе новый ключ, вот он:<br><br>
+<code>{{ data.instance.keys[0].key_body }}</code><br>
 {% else %}
 
 У тебя уже есть ключи, вот они:<br>
 <br>
-{% for user_key in data %}
-#{{user_key.id}} {{user_key.user.name}} <br><code>{{user_key.key}}</code><br>
+{% for user_key in data.instance.keys %}
+#{{user_key.id}} {{data.telegram_name}} <br><code>{{user_key.key_body}}</code><br>
 {% endfor %}
 {% endif %}
 <br>
