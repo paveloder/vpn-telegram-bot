@@ -32,3 +32,15 @@ class UserKey(SQLModel, table=True):
     )
     key_name: Optional[str]
     key_body: str
+    server_id: int = Field(foreign_key="server.id")
+    server: "Server" = Relationship(back_populates="user_keys")
+
+
+class Server(SQLModel, table=True):
+    """Серверы с развернутым VPN."""
+
+    id: Optional[int] = Field(primary_key=True, default=None)
+    country_code: str
+    ip_address: str
+    user_keys: list[UserKey] = Relationship(back_populates="server")
+    api_url: str
