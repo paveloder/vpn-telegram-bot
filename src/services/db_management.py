@@ -66,6 +66,7 @@ async def add_new_key(
             user=user,
             key_body=key,
             session=session,
+            server=server,
         )
         await session.commit()
         return ServiceResult(user, True)
@@ -75,12 +76,12 @@ async def _add_new_key_to_db(
     user: models.BotUser,
     key_body: str,
     session: AsyncSession,
+    server: models.Server,
 ) -> models.BotUser:
     key = models.UserKey(
-        key_body=key_body,
+        key_body=key_body, user=user, key_name=user.telegram_name, server=server,
     )
-    user.keys.append(key)
-    session.add(user)
+    session.add(key)
     await session.commit()
 
     return user

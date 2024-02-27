@@ -19,7 +19,7 @@ async def test_add_new_key_to_db(outline_mock, db_session, create_server):
     )
     user_key = (await db_session.exec(
         select(UserKey).filter(col(BotUser.telegram_id)==telegram_user_id)
-    )).one()
+    )).unique().one()
 
     assert user_key.user.telegram_id == telegram_user_id
     assert user_key.key_body == "test_key"
@@ -31,5 +31,5 @@ async def test_multiple_memory_db(in_memory_db, create_user_with_key, db_session
     users_from_model = await db_session.exec(
         select(UserKey, BotUser).join(BotUser)
     )
-    assert len(users_from_model.fetchall()) > 0
+    assert len(users_from_model.unique().fetchall()) > 0
     assert users

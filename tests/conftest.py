@@ -14,7 +14,9 @@ from src.models import BotUser, Server, UserKey
 @pytest_asyncio.fixture(name="in_memory_db", scope="session")
 async def in_memory_db_fixture() -> AsyncIterator[aiosqlite.Connection]:
     db = await aiosqlite.connect(
-        "/var/test.sqlite", uri=True, check_same_thread=False,
+        "/var/test.sqlite",
+        uri=True,
+        check_same_thread=False,
     )
     with Path.open("./src/db.sql") as create_tables_sql:
         await db.executescript(create_tables_sql.read())
@@ -71,7 +73,11 @@ async def create_user_with_key_fixture(db_session: AsyncSession):
         is_active=True,
     )
     test_key = UserKey(
-        telegram_id=123, user=test_user, key_name="test_key", key_body="test_body"
+        telegram_id=123,
+        user=test_user,
+        key_name="test_key",
+        key_body="test_body",
+        server_id=1,
     )
     db_session.add(test_user)
     db_session.add(test_key)
