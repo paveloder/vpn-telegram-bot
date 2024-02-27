@@ -21,7 +21,7 @@ async def user_get_or_create(
                     col(models.BotUser.telegram_id) == telegram_user_id
                 ),
             )
-        ).one()
+        ).unique().one()
     except exc.NoResultFound:
         user = models.BotUser(
             telegram_id=telegram_user_id,
