@@ -1,5 +1,6 @@
 import logging
 
+from telegram import Update
 from telegram.ext import (
     Application,
     ApplicationBuilder,
@@ -17,11 +18,11 @@ COMMAND_HANDLERS = {
     "get_key": handlers.get_new_key,
     "help": handlers.show_help,
     "pay": handlers.add_money_to_billing_account,
+    "list_servers": handlers.list_all_servers_handler,
 }
 
 CALLBACK_QUERY_HANDLERS = {
-    "pay": handlers.add_money_to_billing_account,
-    "help": handlers.show_help,
+    rf"^{config.SERVER_PATTERN}(\d+)$": handlers.get_new_key,
     # rf"^{config.BILLING_LIST_PATTERN}(\d+)$": handlers.all_books_button,
 }
 
@@ -57,7 +58,7 @@ def main():
     application.add_handler(
         MessageHandler(filters.SUCCESSFUL_PAYMENT, handlers.successful_payment_callback)
     )
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":

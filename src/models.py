@@ -42,5 +42,8 @@ class Server(SQLModel, table=True):
     id: Optional[int] = Field(primary_key=True, default=None)
     country_code: str
     ip_address: str
-    user_keys: list[UserKey] = Relationship(back_populates="server")
+    user_keys: list[UserKey] = Relationship(
+        back_populates="server", sa_relationship_kwargs={"uselist": True}
+    )
+    is_active: bool = Field(default=True)
     api_url: str

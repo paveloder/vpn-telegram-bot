@@ -1,10 +1,10 @@
-from typing import NamedTuple
+from typing import NamedTuple, Sequence
 
 from sqlalchemy import exc
 from sqlmodel import SQLModel, col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src import models
+from src import config, models
 from src.services import outline
 
 
@@ -37,28 +37,38 @@ class ServiceResult(NamedTuple):
     is_created: bool
 
 
+async def _get_server_by_id(server_id: int, session: AsyncSession) -> models.Server:
+    return (
+        await session.exec(
+            select(models.Server).filter(col(models.Server.id) == server_id)
+        )
+    ).one()
+
+
 async def add_new_key(
     telegram_user_id: int,
     telegram_user_name: str,
     telegram_user_fullname: str,
-    session: AsyncSession,
+    server_id: int,
 ) -> ServiceResult:
-    user = await user_get_or_create(
-        telegram_user_id=telegram_user_id,
-        telegram_username=telegram_user_name,
-        telegram_user_fullname=telegram_user_fullname,
-        session=session,
-    )
-    if user.keys:
-        return ServiceResult(user, False)
-    key = outline.create_key(telegram_user_name)
-    user = await _add_new_key_to_db(
-        user=user,
-        key_body=key,
-        session=session,
-    )
-
-    return ServiceResult(user, True)
+    async with AsyncSession(config.engine, expire_on_commit=False) as session:
+        user = await user_get_or_create(
+            telegram_user_id=telegram_user_id,
+            telegram_username=telegram_user_name,
+            telegram_user_fullname=telegram_user_fullname,
+            session=session,
+        )
+        if user.keys:
+            return ServiceResult(user, False)
+        server = await _get_server_by_id(server_id, session=session)
+        key = outline.create_key(server=server, key_name=telegram_user_name)
+        user = await _add_new_key_to_db(
+            user=user,
+            key_body=key,
+            session=session,
+        )
+        await session.commit()
+        return ServiceResult(user, True)
 
 
 async def _add_new_key_to_db(
@@ -74,3 +84,13 @@ async def _add_new_key_to_db(
     await session.commit()
 
     return user
+
+
+async def get_available_servers() -> Sequence[models.Server]:
+    """Получить список доступных серверов."""
+    async with AsyncSession(config.engine, expire_on_commit=False) as session:
+        return (
+            await session.exec(
+                select(models.Server).filter(col(models.Server.is_active))
+            )
+        ).fetchall()

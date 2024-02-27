@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.models import BotUser, UserKey
+from src.models import BotUser, Server, UserKey
 
 
 @pytest_asyncio.fixture(name="in_memory_db", scope="session")
@@ -78,3 +78,17 @@ async def create_user_with_key_fixture(db_session: AsyncSession):
     await db_session.commit()
 
     return test_user, test_key
+
+
+@pytest_asyncio.fixture(name="create_server")
+async def create_server_fixture(db_session: AsyncSession):
+    test_server = Server(
+        api_url="test_url",
+        country_code="TS",
+        ip_address="192.168.0.1",
+        id=1,
+    )
+    db_session.add(test_server)
+    await db_session.commit()
+
+    return test_server

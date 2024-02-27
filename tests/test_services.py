@@ -10,12 +10,12 @@ from src.services.db_management import add_new_key
 
 @pytest.mark.asyncio
 @patch("src.services.db_management.outline.create_key", return_value="test_key")
-async def test_add_new_key_to_db(outline_mock, db_session):
+async def test_add_new_key_to_db(outline_mock, db_session, create_server):
     telegram_user_id = 333
     telegram_username = "test_user"
     telegram_user_fullname = "Test User"
     user_key = await add_new_key(
-        telegram_user_id, telegram_username, telegram_user_fullname, db_session,
+        telegram_user_id, telegram_username, telegram_user_fullname, server_id=1,
     )
     user_key = (await db_session.exec(
         select(UserKey).filter(col(BotUser.telegram_id)==telegram_user_id)

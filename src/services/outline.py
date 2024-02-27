@@ -1,12 +1,17 @@
+from functools import lru_cache
+
 from outline_vpn.outline_vpn import OutlineVPN
 
-from src import config
-
-# Setup the access with the API URL (Use the one provided to you after the server setup)
-client = OutlineVPN(api_url=config.OUTLINE_API_URL)
+from src import models
 
 
-def create_key(key_name: str) -> str:
+@lru_cache
+def create_client(api_url: str) -> OutlineVPN:
+    return OutlineVPN(api_url=api_url)
+
+
+def create_key(key_name: str, server: models.Server) -> str:
+    client = create_client(server.api_url)
     key = client.create_key(key_name=key_name)
     return key.access_url
 
