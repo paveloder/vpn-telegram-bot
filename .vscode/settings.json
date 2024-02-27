@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [".src"],
+    "python.linting.mypyArgs": [
+        "--cache-dir=.mypy_cache/.vscode"
+    ],
+}

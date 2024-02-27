@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from typing import Any, LiteralString
 
 import aiosqlite
+from sqlmodel import SQLModel
 
 from src import config
 
@@ -74,3 +75,8 @@ def _get_result_with_column_names(cursor: aiosqlite.Cursor, row: aiosqlite.Row) 
     for index, column_name in enumerate(column_names):
         resulting_row[column_name] = row[index]
     return resulting_row
+
+
+async def async_init_db() -> None:
+    async with config.engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)

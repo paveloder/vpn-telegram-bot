@@ -14,11 +14,17 @@ aiosqlite = "==0.18.0"
 python-dotenv = "==0.21.1"
 jinja2 = "==3.1.2"
 outline-vpn-api = "^4.0.1"
+sqlmodel = "^0.0.16"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.27"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.2.0"
-mypy = "^1.1"
+mypy = "^1.8.0"
 ruff = "^0.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest-asyncio = "^0.23.5"
+mypy = "1.6.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -33,3 +39,17 @@ ignore = ["A003"]
 
 [tool.pyright]
 reportUnnecessaryTypeIgnoreComment="warning"
+
+[tool.ruff.per-file-ignores]
+"tests/**/*.py" = [
+    # at least this three should be fine in tests:
+    "S101", # asserts allowed in tests...
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    # The below are debateable
+    "PLR2004", # Magic value used in comparison, ...
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+]
+
+[tool.mypy]
+ignore_missing_imports = true

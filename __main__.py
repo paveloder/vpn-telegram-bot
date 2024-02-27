@@ -1,6 +1,8 @@
 import logging
 
+from telegram import Update
 from telegram.ext import (
+    Application,
     ApplicationBuilder,
     CallbackQueryHandler,
     CommandHandler,
@@ -9,19 +11,19 @@ from telegram.ext import (
 )
 
 from src import config, handlers
-from src.db import close_db
+from src.db import async_init_db, close_db
 
 COMMAND_HANDLERS = {
     "start": handlers.start,
     "get_key": handlers.get_new_key,
     "help": handlers.show_help,
     "pay": handlers.add_money_to_billing_account,
+    "list_servers": handlers.list_all_servers_handler,
 }
 
 CALLBACK_QUERY_HANDLERS = {
-    "pay": handlers.add_money_to_billing_account,
-    "help": handlers.show_help,
-   # rf"^{config.BILLING_LIST_PATTERN}(\d+)$": handlers.all_books_button,
+    rf"^{config.SERVER_PATTERN}(\d+)$": handlers.get_new_key,
+    # rf"^{config.BILLING_LIST_PATTERN}(\d+)$": handlers.all_books_button,
 }
 
 
@@ -38,8 +40,14 @@ if not config.TELEGRAM_BOT_TOKEN or not config.VPN_TELEGRAM_BOT_CHANNEL_ID:
     )
 
 
+async def post_init(application: Application) -> None:
+    await async_init_db()
+
+
 def main():
-    application = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
+    application = (
+        ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).post_init(post_init).build()
+    )
 
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
@@ -50,7 +58,7 @@ def main():
     application.add_handler(
         MessageHandler(filters.SUCCESSFUL_PAYMENT, handlers.successful_payment_callback)
     )
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
