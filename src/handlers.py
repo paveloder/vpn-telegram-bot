@@ -2,14 +2,13 @@ from decimal import Context
 from typing import cast
 
 import telegram
+from services.validation import is_user_in_channel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from telegram import (
     Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    KeyboardButton,
     LabeledPrice,
-    ReplyKeyboardMarkup,
     Update,
     User,
 )
@@ -17,8 +16,20 @@ from telegram.ext import ContextTypes
 
 import src.services.db_management as db_management
 from src import config
-from src.templates import render_template  # type: ignore
+from src.templates import render_template
 
+
+def validate_user(handler):
+    async def wrapped(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = cast(User, update.effective_user).id
+        if not await is_user_in_channel(user_id, config.TELEGRAM_VPN_CHANNEL_ID):
+            await send_response(
+                update, context, response=render_template("vote_cant_vote.j2")
+            )
+            return
+        await handler(update, context)
+
+    return wrapped
 
 async def send_response(
     update: Update,
