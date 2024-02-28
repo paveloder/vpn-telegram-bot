@@ -1,33 +1,12 @@
-from pathlib import Path
 from typing import AsyncIterator
 from unittest.mock import patch
 
-import aiosqlite
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.models import BotUser, Server, UserKey
-
-
-@pytest_asyncio.fixture(name="in_memory_db", scope="session")
-async def in_memory_db_fixture() -> AsyncIterator[aiosqlite.Connection]:
-    db = await aiosqlite.connect(
-        "/var/test.sqlite",
-        uri=True,
-        check_same_thread=False,
-    )
-    with Path.open("./src/db.sql") as create_tables_sql:
-        await db.executescript(create_tables_sql.read())
-    yield db
-    await db.close()
-
-
-@pytest_asyncio.fixture(name="patch_db", scope="session", autouse=True)
-async def patch_db_fixture(in_memory_db) -> AsyncIterator[aiosqlite.Connection]:
-    with patch("src.db.get_db", return_value=in_memory_db):
-        yield in_memory_db
 
 
 async def _init_models(engine: AsyncEngine):
@@ -54,14 +33,6 @@ async def patch_engine_fixture() -> AsyncIterator[AsyncEngine]:
 async def db_session_fixture(patch_engine) -> AsyncIterator[AsyncSession]:
     async with AsyncSession(patch_engine) as session:
         yield session
-
-
-@pytest_asyncio.fixture(name="get_db", scope="session")
-async def get_db_fixture(in_memory_db):
-    async def _get_db():
-        return in_memory_db
-
-    return _get_db
 
 
 @pytest_asyncio.fixture(name="create_user_with_key", scope="session")

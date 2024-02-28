@@ -11,13 +11,12 @@ from telegram.ext import (
 )
 
 from src import config, handlers
-from src.db import async_init_db, close_db
+from src.db import async_init_db
 
 COMMAND_HANDLERS = {
     "start": handlers.start,
     "get_key": handlers.get_new_key,
     "help": handlers.show_help,
-    "pay": handlers.add_money_to_billing_account,
     "list_servers": handlers.list_all_servers_handler,
 }
 
@@ -55,9 +54,6 @@ def main():
     for pattern, handler in CALLBACK_QUERY_HANDLERS.items():
         application.add_handler(CallbackQueryHandler(handler, pattern=pattern))
 
-    application.add_handler(
-        MessageHandler(filters.SUCCESSFUL_PAYMENT, handlers.successful_payment_callback)
-    )
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
@@ -68,5 +64,3 @@ if __name__ == "__main__":
         import traceback
 
         logger.warning(traceback.format_exc())
-    finally:
-        close_db()

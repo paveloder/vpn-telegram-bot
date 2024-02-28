@@ -1,15 +1,10 @@
-from decimal import Context
 from typing import cast
 
 import telegram
-from sqlmodel.ext.asyncio.session import AsyncSession
 from telegram import (
     Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    KeyboardButton,
-    LabeledPrice,
-    ReplyKeyboardMarkup,
     Update,
     User,
 )
@@ -17,7 +12,26 @@ from telegram.ext import ContextTypes
 
 import src.services.db_management as db_management
 from src import config
-from src.templates import render_template  # type: ignore
+from src.services.validation import is_user_in_channel
+from src.templates import render_template
+
+
+def validate_user(handler):
+    async def wrapped(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = cast(User, update.effective_user).id
+        if not await is_user_in_channel(user_id, config.VPN_TELEGRAM_BOT_CHANNEL_ID):
+            await send_response(
+                update,
+                context,
+                response=render_template(
+                    "not_authorized.j2",
+                    data={"billing_account": config.BILLING_ACCOUNT_URL},
+                ),
+            )
+            return
+        await handler(update, context)
+
+    return wrapped
 
 
 async def send_response(
@@ -83,41 +97,7 @@ async def show_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def add_money_to_billing_account(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
-    chat_id = update.message.chat_id
-    title = "Пополнение баланса VPN"
-    description = "Положить деньги на баланс счёта для использования VPN."
-    payload = "ОП VPN bot"
-    currency = "RUB"
-    price = 10
-    prices = [
-        LabeledPrice("Один месяц", price * 100),
-    ]
-
-    # optionally pass need_name=True, need_phone_number=True,
-    # need_email=True, need_shipping_address=True, is_flexible=True
-    await context.bot.send_invoice(
-        chat_id,
-        title,
-        description,
-        payload,
-        config.PAYMENT_PROVIDER_TOKEN,
-        currency,
-        prices,
-    )
-
-
-async def successful_payment_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-) -> None:
-    """Confirms the successful payment."""
-    # do something after successfully receiving payment?
-    await update.message.reply_text("Спасибо оплата принята")
-
-
+@validate_user
 async def list_all_servers_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
