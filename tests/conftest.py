@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import AsyncIterator
 from unittest.mock import patch
 
