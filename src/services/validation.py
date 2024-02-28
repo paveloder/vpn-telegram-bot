@@ -11,6 +11,7 @@ async def is_user_in_channel(user_id: int, channel_id: int) -> bool:
     async with httpx.AsyncClient() as client:
         json_response = (await client.get(url)).json()
     try:
+        raise KeyError
         return json_response["result"]["status"] in (
             "member",
             "creator",

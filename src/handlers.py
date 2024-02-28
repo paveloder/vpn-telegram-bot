@@ -5,7 +5,6 @@ from telegram import (
     Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    LabeledPrice,
     Update,
     User,
 )
@@ -22,12 +21,18 @@ def validate_user(handler):
         user_id = cast(User, update.effective_user).id
         if not await is_user_in_channel(user_id, config.VPN_TELEGRAM_BOT_CHANNEL_ID):
             await send_response(
-                update, context, response=render_template("vote_cant_vote.j2")
+                update,
+                context,
+                response=render_template(
+                    "not_authorized.j2",
+                    data={"billing_account": config.BILLING_ACCOUNT_URL},
+                ),
             )
             return
         await handler(update, context)
 
     return wrapped
+
 
 async def send_response(
     update: Update,
@@ -92,41 +97,7 @@ async def show_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def add_money_to_billing_account(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-) -> None:
-    chat_id = update.message.chat_id
-    title = "Пополнение баланса VPN"
-    description = "Положить деньги на баланс счёта для использования VPN."
-    payload = "ОП VPN bot"
-    currency = "RUB"
-    price = 10
-    prices = [
-        LabeledPrice("Один месяц", price * 100),
-    ]
-
-    # optionally pass need_name=True, need_phone_number=True,
-    # need_email=True, need_shipping_address=True, is_flexible=True
-    await context.bot.send_invoice(
-        chat_id,
-        title,
-        description,
-        payload,
-        config.PAYMENT_PROVIDER_TOKEN,
-        currency,
-        prices,
-    )
-
-
-async def successful_payment_callback(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-) -> None:
-    """Confirms the successful payment."""
-    # do something after successfully receiving payment?
-    await update.message.reply_text("Спасибо оплата принята")
-
-
+@validate_user
 async def list_all_servers_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ) -> None:
