@@ -16,12 +16,16 @@ async def user_get_or_create(
 ) -> models.BotUser:
     try:
         user = (
-            await session.exec(
-                select(models.BotUser).filter(
-                    col(models.BotUser.telegram_id) == telegram_user_id
-                ),
+            (
+                await session.exec(
+                    select(models.BotUser).filter(
+                        col(models.BotUser.telegram_id) == telegram_user_id
+                    ),
+                )
             )
-        ).unique().one()
+            .unique()
+            .one()
+        )
     except exc.NoResultFound:
         user = models.BotUser(
             telegram_id=telegram_user_id,
@@ -45,6 +49,22 @@ async def _get_server_by_id(server_id: int, session: AsyncSession) -> models.Ser
     ).one()
 
 
+async def _check_if_user_has_key(
+    user: models.BotUser, server_id: int, session: AsyncSession
+) -> list[models.UserKey]:
+    return list(
+        (
+            await session.exec(
+                select(models.UserKey)
+                .where(col(models.UserKey.user) == user)
+                .where(models.UserKey.server_id == server_id)
+            )
+        )
+        .unique()
+        .fetchall()
+    )
+
+
 async def add_new_key(
     telegram_user_id: int,
     telegram_user_name: str,
@@ -58,7 +78,10 @@ async def add_new_key(
             telegram_user_fullname=telegram_user_fullname,
             session=session,
         )
-        if user.keys:
+        user_keys = await _check_if_user_has_key(
+            user=user, server_id=server_id, session=session
+        )
+        if user_keys:
             return ServiceResult(user, False)
         server = await _get_server_by_id(server_id, session=session)
         key = outline.create_key(server=server, key_name=telegram_user_name)
@@ -79,7 +102,10 @@ async def _add_new_key_to_db(
     server: models.Server,
 ) -> models.BotUser:
     key = models.UserKey(
-        key_body=key_body, user=user, key_name=user.telegram_name, server=server,
+        key_body=key_body,
+        user=user,
+        key_name=user.telegram_name,
+        server=server,
     )
     session.add(key)
     await session.commit()
