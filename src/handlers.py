@@ -2,7 +2,6 @@ from decimal import Context
 from typing import cast
 
 import telegram
-from services.validation import is_user_in_channel
 from sqlmodel.ext.asyncio.session import AsyncSession
 from telegram import (
     Chat,
@@ -16,6 +15,7 @@ from telegram.ext import ContextTypes
 
 import src.services.db_management as db_management
 from src import config
+from src.services.validation import is_user_in_channel
 from src.templates import render_template
 
 

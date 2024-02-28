@@ -11,7 +11,7 @@ from telegram.ext import (
 )
 
 from src import config, handlers
-from src.db import async_init_db, close_db
+from src.db import async_init_db
 
 COMMAND_HANDLERS = {
     "start": handlers.start,
@@ -68,5 +68,3 @@ if __name__ == "__main__":
         import traceback
 
         logger.warning(traceback.format_exc())
-    finally:
-        close_db()
