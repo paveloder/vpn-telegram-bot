@@ -1,11 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class BotUser(SQLModel, AsyncAttrs, table=True):
+class BotUser(SQLModel, table=True):
     """Модель пользователей бота."""
 
     __tablename__ = "bot_user"

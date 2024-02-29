@@ -1,6 +1,8 @@
 from typing import cast
 
+import services.db_management as db_management
 import telegram
+from services.validation import is_user_in_channel
 from telegram import (
     Chat,
     InlineKeyboardButton,
@@ -9,11 +11,9 @@ from telegram import (
     User,
 )
 from telegram.ext import ContextTypes
+from templates import render_template
 
-import src.services.db_management as db_management
-from src import config
-from src.services.validation import is_user_in_channel
-from src.templates import render_template
+import config
 
 
 def validate_user(handler):

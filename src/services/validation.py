@@ -2,7 +2,7 @@ import urllib.parse
 
 import httpx
 
-from src import config
+import config
 
 
 async def is_user_in_channel(user_id: int, channel_id: int) -> bool:

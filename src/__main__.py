@@ -1,17 +1,16 @@
 import logging
 
+import handlers
+from db import async_init_db
 from telegram import Update
 from telegram.ext import (
     Application,
     ApplicationBuilder,
     CallbackQueryHandler,
     CommandHandler,
-    MessageHandler,
-    filters,
 )
 
-from src import config, handlers
-from src.db import async_init_db
+import config
 
 COMMAND_HANDLERS = {
     "start": handlers.start,

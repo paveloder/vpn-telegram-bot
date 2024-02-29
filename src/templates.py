@@ -2,7 +2,7 @@ import re
 
 import jinja2
 
-from src import config
+import config
 
 
 def render_template(template_name: str, data: dict | None = None) -> str:
