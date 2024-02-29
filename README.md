@@ -34,4 +34,13 @@ docker compose -f docker-compose.deploy.yml up -d --build
 
 ### Добавление серверов
 
-...
+Чтобы добавить сервер откроем БД sqlite:
+```bash
+sudo sqlite3 /var/lib/docker/volumes/vpn-telegram-bot_bot_service_data/_data/db.sqlite3
+```
+
+Далее выполним вставку в таблицу (замените реальными значениями):
+```sql
+insert into server(country_code, ip_address, api_url, is_active)
+values ('Russia', '192.168.0.1', '****', 1);
+```
