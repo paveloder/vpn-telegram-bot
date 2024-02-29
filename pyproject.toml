@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 
-python-telegram-bot = "==20.0"
+python-telegram-bot = {extras = ["job-queue"], version = "^20.8"}
 aiosqlite = "==0.18.0"
 python-dotenv = "==0.21.1"
 jinja2 = "==3.1.2"

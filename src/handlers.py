@@ -10,7 +10,7 @@ from telegram import (
     Update,
     User,
 )
-from telegram.ext import ContextTypes
+from telegram.ext import Application, ContextTypes
 from templates import render_template
 
 import config
@@ -60,11 +60,31 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_response(update, context, response=render_template("start.j2"))
 
 
+async def add_payment_notification_job(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+):
+    chat_id = update.effective_message.chat_id
+    user_id = update.effective_user.id
+
+    context.job_queue.run_repeating(
+        callback=send_message_job,
+        interval=10.0,
+        first=0.0,
+        chat_id=chat_id,
+        user_id=user_id,
+    )
+
+
 async def get_new_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     if not query.data or not query.data.strip():
         return
+    # await add_payment_notification_job(update, context)
+    await db_management.add_user_chat(
+        user_id=update.effective_user.id,
+        chat_id=update.effective_message.chat_id,
+    )
     keys = await db_management.add_new_key(
         cast(User, update.effective_user).id,
         cast(User, update.effective_user).name,
@@ -119,3 +139,23 @@ async def list_all_servers_handler(
             reply_keyboard,
         ),
     )
+
+
+async def send_message_job(context: ContextTypes.DEFAULT_TYPE):
+    job = context.job
+
+    await context.bot.send_message(chat_id=job.chat_id, text="job executed")
+
+
+async def trigger_notification_jobs(application: Application):
+    """Восстанавливаем напоминания пользователям."""
+    users = await db_management.list_all_user_chats()
+    job = application.job_queue
+    for user in users:
+        job.run_repeating(
+            callback=send_message_job,
+            interval=10.0,
+            first=0.0,
+            chat_id=user.telegram_id,
+            user_id=user.telegram_id,
+        )

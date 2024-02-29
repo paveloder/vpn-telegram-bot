@@ -122,3 +122,9 @@ async def get_available_servers() -> Sequence[models.Server]:
                 select(models.Server).filter(col(models.Server.is_active))
             )
         ).fetchall()
+
+
+async def list_all_user_chats() -> list[models.BotUser]:
+    async with AsyncSession(config.engine) as session:
+        chats = (await session.exec(select(models.BotUser))).unique().all()
+    return list(chats)

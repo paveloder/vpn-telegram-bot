@@ -8,6 +8,7 @@ from telegram.ext import (
     ApplicationBuilder,
     CallbackQueryHandler,
     CommandHandler,
+    Updater,
 )
 
 import config
@@ -40,13 +41,16 @@ if not config.TELEGRAM_BOT_TOKEN or not config.VPN_TELEGRAM_BOT_CHANNEL_ID:
 
 async def post_init(application: Application) -> None:
     await async_init_db()
+    await handlers.trigger_notification_jobs(application)
 
 
 def main():
     application = (
-        ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).post_init(post_init).build()
+        ApplicationBuilder()
+        .token(config.TELEGRAM_BOT_TOKEN)
+        .post_init(post_init)
+        .build()
     )
-
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
 
