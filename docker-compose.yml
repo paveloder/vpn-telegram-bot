@@ -12,7 +12,7 @@ services:
         args:
           SERVICE_ENV: development
       env_file: ./config/.env
-      command: python ./__main__.py
+      command: python ./src/__main__.py
       volumes:
         - bot_service_data:/var/bot_service_data/
 

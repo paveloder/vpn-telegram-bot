@@ -1,15 +1,14 @@
 from unittest.mock import patch
 
 import pytest
+from models import BotUser, UserKey
+from services.db_management import _check_if_user_has_key, add_new_key
 from sqlmodel import col, select
-
-from src.models import BotUser, UserKey
-from src.services.db_management import _check_if_user_has_key, add_new_key
 
 
 @pytest.mark.asyncio
-@patch("src.services.db_management._check_if_user_has_key", return_value=[])
-@patch("src.services.db_management.outline.create_key", return_value="test_key")
+@patch("services.db_management._check_if_user_has_key", return_value=[])
+@patch("services.db_management.outline.create_key", return_value="test_key")
 async def test_add_new_key_to_db(
     outline_mock, user_has_key_return, db_session, create_server
 ):

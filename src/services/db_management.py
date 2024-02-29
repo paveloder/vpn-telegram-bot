@@ -1,11 +1,12 @@
 from typing import NamedTuple, Sequence
 
+import models
 from sqlalchemy import exc
 from sqlmodel import SQLModel, col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src import config, models
-from src.services import outline
+import config
+from services import outline
 
 
 async def user_get_or_create(

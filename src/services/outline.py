@@ -1,8 +1,7 @@
 from functools import lru_cache
 
+import models
 from outline_vpn.outline_vpn import OutlineKey, OutlineVPN
-
-from src import models
 
 
 @lru_cache

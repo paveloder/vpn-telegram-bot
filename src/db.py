@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel
 
-from src import config
+import config
 
 
 async def async_init_db() -> None:

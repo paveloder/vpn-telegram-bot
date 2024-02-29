@@ -23,6 +23,11 @@ pytest = "^7.2.0"
 ruff = "^0.1.0"
 mypy = "^1.8.0"
 
+[tool.pytest.ini_options]
+pythonpath = [
+  "./src"
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -2,11 +2,10 @@ from typing import AsyncIterator
 from unittest.mock import patch
 
 import pytest_asyncio
+from models import BotUser, Server, UserKey
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
-
-from src.models import BotUser, Server, UserKey
 
 
 async def _init_models(engine: AsyncEngine):
@@ -18,7 +17,7 @@ async def _init_models(engine: AsyncEngine):
 @pytest_asyncio.fixture(name="patch_engine", scope="session", autouse=True)
 async def patch_engine_fixture() -> AsyncIterator[AsyncEngine]:
     with patch(
-        "src.config.engine",
+        "config.engine",
         new=create_async_engine(
             "sqlite+aiosqlite:////var/test.sqlite?cache=shared",
             connect_args={"check_same_thread": False},
