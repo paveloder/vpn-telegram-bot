@@ -3,4 +3,15 @@
     "python.linting.mypyArgs": [
         "--cache-dir=.mypy_cache/.vscode"
     ],
+    "nameLong": true,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.indexing": true,
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "sqlmodel",
+            "depth": 10,
+            "includeAllSymbols": true
+        }
+    ],
+    "python.languageServer": "Pylance"
 }

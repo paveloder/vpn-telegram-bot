@@ -8,7 +8,6 @@ from telegram.ext import (
     ApplicationBuilder,
     CallbackQueryHandler,
     CommandHandler,
-    Updater,
 )
 
 import config
@@ -18,10 +17,13 @@ COMMAND_HANDLERS = {
     "get_key": handlers.get_new_key,
     "help": handlers.show_help,
     "list_servers": handlers.list_all_servers_handler,
+    "balance": handlers.check_account_balance,
 }
 
 CALLBACK_QUERY_HANDLERS = {
     rf"^{config.SERVER_PATTERN}(\d+)$": handlers.get_new_key,
+    rf"^{config.BALANCE_PATTERN}add$": handlers.add_account_balance,
+    rf"^{config.BILL_PATTERN}.+$": handlers.check_account_balance,
     # rf"^{config.BILLING_LIST_PATTERN}(\d+)$": handlers.all_books_button,
 }
 
@@ -41,7 +43,9 @@ if not config.TELEGRAM_BOT_TOKEN or not config.VPN_TELEGRAM_BOT_CHANNEL_ID:
 
 async def post_init(application: Application) -> None:
     await async_init_db()
-    await handlers.trigger_notification_jobs(application)
+    await handlers.trigger_check_payment_job(application)
+    await handlers.trigger_monthly_jobs(application)
+    # await handlers.trigger_notification_jobs(application)
 
 
 def main():

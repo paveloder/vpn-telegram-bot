@@ -987,7 +987,19 @@ h2 = ["h2 (>=4,<5)"]
 socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
 zstd = ["zstandard (>=0.18.0)"]
 
+[[package]]
+name = "yoomoney"
+version = "0.1.0"
+description = "Unofficial YooMoney API python library"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "YooMoney-0.1.0-py3-none-any.whl", hash = "sha256:7d0474999c622d795a1c2cf5a7460008915d6975f51f8c41d0aea4071648907c"},
+    {file = "YooMoney-0.1.0.tar.gz", hash = "sha256:9a8f88c54c70ed93fc5ae91f26a76df7aa3eadb1f32f4ef26840c15fe65ad848"},
+]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "f4aabc5002879100d6a213199bcdf8ffb2dd7426ade7154fd2e69beb4def24f8"
+content-hash = "fb3816cfffd39590b646609aa077050e0163c339eef95d4282a5d0d5db4a394c"
