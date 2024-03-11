@@ -2,13 +2,10 @@ from unittest.mock import patch
 
 import pytest
 from models import Balance, BotUser, UserKey
+from services.billing import add_money_to_balance, check_balance, delete_stale_bills, list_unpayed_bills
 from services.db_management import (
     _check_if_user_has_key,
-    add_money_to_balance,
     add_new_key,
-    check_balance,
-    delete_stale_bills,
-    list_unpayed_bills,
 )
 from sqlalchemy import func
 from sqlmodel import col, select

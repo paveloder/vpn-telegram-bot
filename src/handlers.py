@@ -1,11 +1,11 @@
 import logging
 from typing import cast
 
+import services.billing
 import services.db_management as db_management
 import telegram
 from services import yoomoney
 from services.validation import is_user_in_channel
-from sqlmodel.ext.asyncio.session import AsyncSession
 from telegram import (
     Chat,
     InlineKeyboardButton,
@@ -184,8 +184,8 @@ async def check_bills_handler(context: ContextTypes.DEFAULT_TYPE):
     if not job or not job.user_id or not job.chat_id:
         return
     user_id = int(job.user_id)
-    await db_management.delete_stale_bills()
-    payed_bills = await db_management.check_payment_status_for_bills(user_id)
+    await services.billing.delete_stale_bills()
+    payed_bills = await services.billing.check_payment_status_for_bills(user_id)
 
     for bill in payed_bills:
         await context.bot.send_message(
@@ -211,7 +211,7 @@ async def trigger_check_payment_job(application: Application):
 
 
 async def withdraw_monthly_fee_handler(context: ContextTypes.DEFAULT_TYPE):
-    await db_management.withdraw_monthly_fee()
+    await services.billing.withdraw_monthly_fee()
 
 
 async def trigger_monthly_jobs(application: Application):
@@ -242,7 +242,7 @@ async def trigger_notification_jobs(application: Application):
 async def check_account_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not update.effective_user:
         return
-    balance = await db_management.check_balance(user_id=update.effective_user.id)
+    balance = await services.billing.check_balance(user_id=update.effective_user.id)
 
     reply_keyboard = [
         [
