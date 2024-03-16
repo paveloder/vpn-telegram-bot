@@ -1,3 +1,5 @@
+import logging
+from datetime import datetime
 from typing import NamedTuple, Sequence
 
 import models
@@ -7,6 +9,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 import config
 from services import outline
+from services.billing import add_money_to_balance, check_balance
+
+logger = logging.getLogger(__name__)
+
+
+class NotEnoughMoneyOnBalanceError(Exception):
+    """Недостаточно денег на счету."""
 
 
 async def user_get_or_create(
@@ -84,6 +93,13 @@ async def add_new_key(
         )
         if user_keys:
             return ServiceResult(user, False)
+        current_balance = await check_balance(user_id=telegram_user_id)
+        if current_balance >= config.MONTHLY_FEE:
+            await add_money_to_balance(
+                telegram_user_id, ammount=-config.MONTHLY_FEE, session=session
+            )
+        else:
+            raise NotEnoughMoneyOnBalanceError
         server = await _get_server_by_id(server_id, session=session)
         key = outline.create_key(server=server, key_name=telegram_user_name)
         user = await _add_new_key_to_db(
@@ -107,6 +123,7 @@ async def _add_new_key_to_db(
         user=user,
         key_name=user.telegram_name,
         server=server,
+        last_payed_at=datetime.now(),
     )
     session.add(key)
     await session.commit()
@@ -122,3 +139,13 @@ async def get_available_servers() -> Sequence[models.Server]:
                 select(models.Server).filter(col(models.Server.is_active))
             )
         ).fetchall()
+
+
+async def list_all_user_chats() -> list[models.BotUser]:
+    async with AsyncSession(config.engine) as session:
+        chats = (await session.exec(select(models.BotUser))).unique().all()
+    return list(chats)
+
+
+
+
