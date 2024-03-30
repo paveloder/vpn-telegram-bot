@@ -12,6 +12,10 @@
     "workspaceFolder": "/code/",
     "customizations": {
         "vscode": {
+            // Bug fix on Mac: https://github.com/microsoft/vscode-remote-release/issues/8169
+			"settings": {
+				"extensions.verifySignature": false
+			},
             "extensions": [
 				"ms-python.python",
 				"ms-python.vscode-pylance",
