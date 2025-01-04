@@ -30,7 +30,7 @@ COPY ./uv.lock ./pyproject.toml /code/
 
 # We do not want to install dev dependepcies for prod.
 RUN echo "$SERVICE_ENV" \
-  && uv sync  \
+  && uv sync --frozen --no-cache \
   $(if [ "$SERVICE_ENV" = 'production' ]; then echo '--no-dev'; fi)
 
 # create db objects if not exists:
