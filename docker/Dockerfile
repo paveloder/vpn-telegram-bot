@@ -1,29 +1,33 @@
 FROM python:3.11-slim AS development_build
 ARG SERVICE_ENV
 ENV SERVICE_ENV=${SERVICE_ENV} \
-# poetry:
-  POETRY_VERSION=1.3.1 \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/var/cache/pypoetry' \
+  PYTHONUNBUFFERED=1 \
 # send output to stdout
-  PYTHONUNBUFFERED=1
+  UV_PROJECT_ENVIRONMENT="/usr/local/"
+
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
     sqlite3 pkg-config \
-  && pip install "poetry==${POETRY_VERSION}" && poetry --version
+    curl ca-certificates
+
+# Download the latest installer
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+
+# Run the installer then remove it
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+
+# Ensure the installed binary is on the `PATH`
+ENV PATH="/root/.local/bin/:$PATH"
 
 # Copy only requirements, to cache them in docker layer
 WORKDIR /code
-COPY ./poetry.lock ./pyproject.toml /code/
+COPY ./uv.lock ./pyproject.toml /code/
 
 # We do not want to install dev dependepcies for prod.
 RUN echo "$SERVICE_ENV" \
-  && poetry install \
-    $(if [ "$SERVICE_ENV" = 'production' ]; then echo '--no-dev'; fi) \
-    --no-interaction --no-ansi \
-  # Cleaning poetry installation's cache for production:
-  && if [ "$SERVICE_ENV" = 'production' ]; then rm -rf "$POETRY_CACHE_DIR"; fi
+  && uv sync --frozen --no-cache \
+  $(if [ "$SERVICE_ENV" = 'production' ]; then echo '--no-dev'; fi)
 
 # create db objects if not exists:
 RUN if [ -f /var/bot_service_data/db.sqlite3 ]; then \
