@@ -1,10 +1,6 @@
 FROM python:3.11-slim AS development_build
 ARG SERVICE_ENV
 ENV SERVICE_ENV=${SERVICE_ENV} \
-# poetry:
-  POETRY_VERSION=1.3.1 \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/var/cache/pypoetry' \
   PYTHONUNBUFFERED=1 \
 # send output to stdout
   UV_PROJECT_ENVIRONMENT="/usr/local/"
